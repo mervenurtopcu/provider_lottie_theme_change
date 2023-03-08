@@ -19,10 +19,8 @@ class _LottiePageState extends State<LottiePage> with TickerProviderStateMixin {
   late AnimationController controller;
   bool isLight = false;
 
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     controller = AnimationController(
         vsync: this, duration: DurationItems.durationNormal());
@@ -32,7 +30,7 @@ class _LottiePageState extends State<LottiePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final providerWatch = context.watch<LottiePageProvider>();
     final providerRead = context.read<LottiePageProvider>();
-    final provider = context.read<ThemeNotifier>();
+    final providerr = context.read<ThemeNotifier>();
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -41,25 +39,52 @@ class _LottiePageState extends State<LottiePage> with TickerProviderStateMixin {
               await controller.animateTo(!isLight ? 0.5 : 1,
                   duration: DurationItems.durationNormal());
               isLight = !isLight;
-              provider.changeTheme();
+              providerr.changeTheme();
             },
             child: Lottie.asset(LottieItems.themeChange.lottiePath,
                 repeat: false, controller: controller),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          providerRead.changeVisible();
-          controller.animateTo( providerWatch.currentVisibilty ? 0 : 1);
-        },
+      floatingActionButton: Selector<LottiePageProvider,bool>(
+          builder: (context, value, child){
+            return value ? FloatingActionButton(
+              onPressed: () {
+                providerRead.changeVisible();
+                controller.animateTo(0);
+              },
+            )
+                : FloatingActionButton(
+              onPressed: () {
+                providerRead.changeVisible();
+                controller.animateTo(1);
+              },
+            );
+          },
+          selector: (context, provider){
+            return provider.currentVisibilty;
+          }
       ),
       body: Center(
-        child: AnimatedContainer(
-          duration: DurationItems.durationNormal(),
-          width: MediaQuery.of(context).size.height * 0.4,
-          height:providerWatch.currentVisibilty ? kZero : 150,
-          color: Colors.red,
+        child: Selector<LottiePageProvider, bool>(
+          builder: (context, value, child) {
+            return value
+                ? AnimatedContainer(
+                    duration: DurationItems.durationNormal(),
+                    width: MediaQuery.of(context).size.height * 0.4,
+                    height: kZero,
+                    color: Colors.red,
+                  )
+                : AnimatedContainer(
+                    duration: DurationItems.durationNormal(),
+                    width: MediaQuery.of(context).size.height * 0.4,
+                    height: MediaQuery.of(context).size.height * 0.2,
+                    color: Colors.red,
+                  );
+          },
+          selector: (context, provider) {
+            return provider.currentVisibilty;
+          },
         ),
       ),
     );
