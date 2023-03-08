@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Material App',
+        debugShowCheckedModeBanner: false,
         theme: context.watch<ThemeNotifier>().currentTheme,
         home: const LottiePage());
   }
